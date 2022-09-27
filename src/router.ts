@@ -6,6 +6,11 @@ const routes: RouteRecordRaw[] = [
     component: () => import("./views/Home.vue"),
   },
   {
+    path: "/new",
+    component: () => import("./views/NewBlog.vue"),
+  },
+
+  {
     path: "/:any(.*)*",
     name: "not-found",
     component: () => import("./views/404.vue"),
