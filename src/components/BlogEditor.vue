@@ -1,25 +1,26 @@
 <script setup lang="ts">
 import { ref } from "vue";
+import { useRouter } from "vue-router";
+import { useStore } from "vuex";
 import BlogInput from "./BlogInput.vue";
-
-interface IBlogInput {
-  type: string;
-  content: any;
-}
 
 const emit = defineEmits(["submit"]);
 
-const content = ref<IBlogInput[]>([]);
+const store = useStore();
+
+const router = useRouter();
+
+const content = store.state.postContent;
 
 function newFile() {
-  content.value.push({
+  store.commit("newPostContent", {
     type: "video",
     content: null,
   });
 }
 
 function newText() {
-  content.value.push({
+  store.commit("newPostContent", {
     type: "text",
     content: null,
   });
@@ -77,7 +78,7 @@ function submitHandler() {
         </div>
       </template>
     </VDropdown>
-    <FormKit type="submit" label="Next" />
+    <FormKit @click="router.push('/new/upload')" type="submit" label="Next" />
   </FormKit>
 </template>
 

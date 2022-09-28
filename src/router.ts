@@ -11,6 +11,11 @@ const routes: RouteRecordRaw[] = [
   },
 
   {
+    path: "/new/upload",
+    component: () => import("./views/Uploading.vue"),
+  },
+
+  {
     path: "/:any(.*)*",
     name: "not-found",
     component: () => import("./views/404.vue"),

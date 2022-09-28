@@ -1,14 +1,30 @@
 import { createStore } from "vuex";
 
-export default createStore({
+export default createStore<{ post: any; postContent: any[]; files: File[] }>({
   state() {
     return {
-      count: 0,
+      post: null,
+      postContent: [],
+      files: [],
     };
   },
   mutations: {
-    increment(state) {
-      state.count++;
+    updatePost(state, data) {
+      state.post = data;
+    },
+    newPostContent(state, data) {
+      state.postContent.push(data);
+    },
+    newFile(state, data) {
+      state.files.push(data);
+    },
+  },
+
+  getters: {
+    videos(state) {
+      return state.postContent
+        .filter((item) => item.type === "video")
+        .map((item) => item.content);
     },
   },
 });

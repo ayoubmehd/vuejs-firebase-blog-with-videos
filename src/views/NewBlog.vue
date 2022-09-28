@@ -1,9 +1,21 @@
 <script setup lang="ts">
 import { addDoc, collection } from "firebase/firestore";
-import { ref as storageRef, uploadBytes } from "firebase/storage";
-import { db, storage } from "../firebase/index";
+import { db } from "../firebase/index";
 import BlogEditor from "../components/BlogEditor.vue";
-import { v4 as uuid } from "uuid";
+import { useStore } from "vuex";
+import { onMounted } from "vue";
+
+const store = useStore();
+
+onMounted(() => {
+  (async () => {
+    const post = await addDoc(collection(db, "posts"), {
+      isPublished: false,
+    });
+
+    store.commit("updatePost", post);
+  })();
+});
 
 async function handleSubmit(content: any) {
   const post = await addDoc(collection(db, "posts"), {
