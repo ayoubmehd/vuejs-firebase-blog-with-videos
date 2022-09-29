@@ -8,7 +8,7 @@ import {
 } from "firebase/firestore";
 import { ref as storageRef } from "firebase/storage";
 import { v4 as uuid } from "uuid";
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, unref } from "vue";
 import { useStore } from "vuex";
 import { storage } from "../firebase";
 
@@ -42,7 +42,7 @@ const content = computed({
 
 onMounted(() => {
   (async () => {
-    docRef.value = await addDoc(collection(post, "content"), {
+    docRef.value = await addDoc(collection(unref(post), "content"), {
       type: props.type,
       content: null,
     });
@@ -51,7 +51,7 @@ onMounted(() => {
 
 const emit = defineEmits(["update:modelValue"]);
 
-function getFile($event: any) {
+async function getFile($event: any) {
   if (!docRef.value) return;
 
   const file: File = $event.target.files[0];
@@ -61,14 +61,43 @@ function getFile($event: any) {
     `videos/${uuid()}.${file.name.split(".").pop()}`
   );
 
+  console.log("GET FILE");
+
   content.value = videoRef.fullPath;
 
-  store.commit("newFile", file);
+  const duration = await getVideoDuration(file);
+
+  store.commit("newFile", {
+    file,
+    duration,
+    progress: 0,
+    from: 0,
+    to: duration,
+    videoRef,
+  });
 
   // setDoc(docRef.value, {
   //   content: videoRef.fullPath,
   //   type: props.type,
   // });
+}
+
+function getVideoDuration(file: File) {
+  const video = document.createElement("video");
+  video.preload = "metadata";
+
+  video.src = URL.createObjectURL(file);
+  return new Promise((resolve, reject) => {
+    video.onloadedmetadata = () => {
+      URL.revokeObjectURL(video.src);
+
+      resolve(video.duration);
+    };
+
+    video.onerror = (err) => {
+      reject("Video format is not suported");
+    };
+  });
 }
 </script>
 <template>

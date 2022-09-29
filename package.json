@@ -9,6 +9,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@ffmpeg/core": "^0.11.0",
+    "@ffmpeg/ffmpeg": "^0.11.5",
     "@formkit/vue": "^1.0.0-beta.10",
     "@tinymce/tinymce-vue": "^4",
     "firebase": "^9.10.0",

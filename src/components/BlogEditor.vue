@@ -25,10 +25,6 @@ function newText() {
     content: null,
   });
 }
-
-function submitHandler() {
-  emit("submit", content.value);
-}
 </script>
 <template>
   <FormKit
@@ -36,7 +32,6 @@ function submitHandler() {
     id="registration-example"
     form-class=""
     submit-label="Save"
-    @submit="submitHandler"
     :actions="false"
   >
     <BlogInput
@@ -78,7 +73,7 @@ function submitHandler() {
         </div>
       </template>
     </VDropdown>
-    <FormKit @click="router.push('/new/upload')" type="submit" label="Next" />
+    <FormKit @click="router.push('/new/upload')" type="button" label="Next" />
   </FormKit>
 </template>
 
