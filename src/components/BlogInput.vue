@@ -10,7 +10,7 @@ import { ref as storageRef } from "firebase/storage";
 import { v4 as uuid } from "uuid";
 import { computed, onMounted, ref, unref } from "vue";
 import { useStore } from "vuex";
-import { storage } from "../firebase";
+import { db, storage } from "../firebase";
 
 const store = useStore();
 
@@ -22,6 +22,7 @@ const props = defineProps<{
 }>();
 
 const docRef = ref<DocumentReference<DocumentData>>();
+const emit = defineEmits(["update:modelValue"]);
 
 const content = computed({
   get() {
@@ -29,31 +30,10 @@ const content = computed({
   },
   set(val) {
     emit("update:modelValue", val);
-    if (!docRef.value) {
-      return;
-    }
-
-    setDoc(docRef.value, {
-      content: val,
-      type: props.type,
-    });
   },
 });
 
-onMounted(() => {
-  (async () => {
-    docRef.value = await addDoc(collection(unref(post), "content"), {
-      type: props.type,
-      content: null,
-    });
-  })();
-});
-
-const emit = defineEmits(["update:modelValue"]);
-
 async function getFile($event: any) {
-  if (!docRef.value) return;
-
   const file: File = $event.target.files[0];
 
   const videoRef = storageRef(
@@ -62,6 +42,8 @@ async function getFile($event: any) {
   );
 
   console.log("GET FILE");
+
+  console.log(videoRef);
 
   content.value = videoRef.fullPath;
 
@@ -75,11 +57,6 @@ async function getFile($event: any) {
     to: duration,
     videoRef,
   });
-
-  // setDoc(docRef.value, {
-  //   content: videoRef.fullPath,
-  //   type: props.type,
-  // });
 }
 
 function getVideoDuration(file: File) {

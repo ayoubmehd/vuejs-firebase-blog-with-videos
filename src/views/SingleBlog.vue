@@ -3,6 +3,7 @@ import { collection, doc, getDoc, getDocs, query } from "firebase/firestore";
 import { onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 import { db } from "../firebase";
+import BlogVideo from "../components/BlogVideo.vue";
 
 const route = useRoute();
 
@@ -48,7 +49,7 @@ onMounted(() => {
           {{ item.content }}
         </p>
 
-        <video v-else :src="item.content"></video>
+        <BlogVideo v-else :path="item.content" />
       </div>
     </template>
   </div>

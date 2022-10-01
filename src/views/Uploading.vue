@@ -1,9 +1,13 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
 import { useStore } from "vuex";
 import { createFFmpeg, fetchFile } from "@ffmpeg/ffmpeg";
 import Progress from "../components/Progress.vue";
 import { uploadBytesResumable } from "firebase/storage";
+import { useRouter } from "vue-router";
+import { addDoc, collection, doc, setDoc } from "firebase/firestore";
+import { db } from "../firebase";
+
+const router = useRouter();
 
 const ffmpeg = createFFmpeg({
   log: true,
@@ -12,7 +16,7 @@ const ffmpeg = createFFmpeg({
 
 const store = useStore();
 
-const { files } = store.state;
+const { files, postContent } = store.state;
 
 function secondsToHms(d: number) {
   d = Number(d);
@@ -21,6 +25,22 @@ function secondsToHms(d: number) {
   const s = Math.floor((d % 3600) % 60);
 
   return `${h}:${m}:${s}`;
+}
+
+async function publishPost() {
+  const post = await addDoc(collection(db, "posts"), {
+    isPublished: true,
+  });
+
+  Promise.all(
+    postContent.map((item: any) =>
+      addDoc(collection(db, "posts", post.id, "content"), item)
+    )
+  ).then(() => {
+    router.push({
+      path: "/",
+    });
+  });
 }
 
 async function startUploading(file: any) {
@@ -59,7 +79,7 @@ async function startUploading(file: any) {
 }
 </script>
 <template>
-  <div class="w-full flex justify-center my-4">
+  <div class="w-full flex flex-wrap justify-center my-4">
     <template v-if="!!files.length">
       <div class="w-1/3" v-for="file in files">
         <label for="">Progress</label>
@@ -84,6 +104,8 @@ async function startUploading(file: any) {
         <FormKit type="button" label="Upload" @click="startUploading(file)" />
       </div>
     </template>
+    <div class="w-full text-center mb-3" v-else>No files to upload</div>
+    <FormKit @click="publishPost" type="button" label="Publish" />
   </div>
 </template>
 
