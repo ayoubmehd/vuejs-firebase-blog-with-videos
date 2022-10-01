@@ -36,7 +36,6 @@ onMounted(() => {
 </script>
 <template>
   <div class="container mx-auto px-4">
-    <h1 class="text-center">Home</h1>
     <div class="flex">
       <div class="grid grid-cols-3 gap-3">
         <BlogCard v-for="post in posts" :post="post" />

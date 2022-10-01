@@ -5,6 +5,9 @@ const routes: RouteRecordRaw[] = [
   {
     path: "/",
     component: () => import("./views/Home.vue"),
+    meta: {
+      title: "Home",
+    },
   },
   {
     path: "/new",
@@ -22,6 +25,7 @@ const routes: RouteRecordRaw[] = [
     name: "register",
     meta: {
       public: true,
+      layout: "empty",
     },
   },
   {
@@ -30,6 +34,7 @@ const routes: RouteRecordRaw[] = [
     name: "login",
     meta: {
       public: true,
+      layout: "empty",
     },
   },
 

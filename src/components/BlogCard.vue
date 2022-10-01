@@ -15,14 +15,9 @@ defineProps<{
 }>();
 </script>
 <template>
-  <router-link
-    :to="{ name: 'blog', params: { id: post.id } }"
-    class="relative block p-8 overflow-hidden border border-gray-100 rounded-lg"
+  <div
+    class="h-full relative border-2 border-gray-200 border-opacity-60 rounded-lg overflow-hidden"
   >
-    <span
-      class="absolute inset-x-0 bottom-0 h-2 bg-gradient-to-r from-green-300 via-blue-500 to-purple-600"
-    ></span>
-
     <div class="absolute right-2 top-2">
       <button @click="emit('edit')" class="text-purple-500">
         <svg style="width: 24px; height: 24px" viewBox="0 0 24 24">
@@ -42,29 +37,32 @@ defineProps<{
       </button>
     </div>
 
-    <div class="justify-between sm:flex">
-      <div>
-        <h5 class="text-xl font-bold text-gray-900">
-          {{ post.title }}
-        </h5>
-
-        <p class="mt-1 text-xs font-medium text-gray-600">{{ post.author }}</p>
-      </div>
-    </div>
-
-    <div class="mt-4 sm:pr-8">
-      <p class="text-sm text-gray-500">
+    <div class="p-6">
+      <h2 class="title-font text-lg font-medium text-gray-900 mb-3">
+        {{ post.title }}
+      </h2>
+      <p class="leading-relaxed mb-3">
         {{ post.brief }}
       </p>
-    </div>
-
-    <dl class="flex mt-6">
-      <div class="flex flex-col-reverse">
-        <dt class="text-sm font-medium text-gray-600">Published</dt>
-        <dd class="text-xs text-gray-500">{{ post.published_at }}</dd>
+      <div class="flex items-center flex-wrap">
+        <router-link
+          :to="{ name: 'blog', params: { id: post.id } }"
+          class="text-purple-700 inline-flex items-center md:mb-2 lg:mb-0"
+          >Learn More<svg
+            class="w-4 h-4 ml-2"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+            fill="none"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M5 12h14"></path>
+            <path d="M12 5l7 7-7 7"></path></svg
+        ></router-link>
       </div>
-    </dl>
-  </router-link>
+    </div>
+  </div>
 </template>
 
 <style scoped></style>
