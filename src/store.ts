@@ -1,6 +1,7 @@
 import { createStore } from "vuex";
 
 export default createStore<{
+  postId: string | null;
   post: { title: string };
   postContent: any[];
   files: File[];
@@ -8,6 +9,7 @@ export default createStore<{
 }>({
   state() {
     return {
+      postId: null, // if id is null then add a new post otherwise edit
       post: {
         title: "",
       },
@@ -20,6 +22,12 @@ export default createStore<{
     updatePost(state, data) {
       state.post = data;
     },
+    setPostContent(state, data) {
+      state.postContent = data;
+    },
+    setPostId(state, { id }) {
+      state.postId = id;
+    },
     newPostContent(state, data) {
       state.postContent.push(data);
     },
@@ -28,6 +36,12 @@ export default createStore<{
     },
     setUser(state, { user }) {
       state.user = user;
+    },
+    clear(state) {
+      state.files = [];
+      state.postContent = [];
+      state.post = { title: "" };
+      state.postId = null;
     },
   },
 

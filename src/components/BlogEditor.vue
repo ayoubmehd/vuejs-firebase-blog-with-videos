@@ -38,20 +38,28 @@ function newText() {
 </script>
 <template>
   <FormKit
+    form-class="w-1/2 flex flex-col items-center"
     type="form"
     id="registration-example"
-    form-class=""
     submit-label="Save"
     :actions="false"
   >
     <FormKit
-      label="Post tile"
+      outer-class="w-full"
+      wrapper-class="max-w-full"
+      inner-class="w-full"
+      input-class="w-full"
+      label="Post title"
       placeholder="Put your post title"
       type="text"
       v-model="postTitle"
     />
 
     <BlogInput
+      outer-class="w-full"
+      wrapper-class="max-w-full"
+      inner-class="w-full"
+      input-class="w-full h-48"
       v-for="item in content"
       :type="item.type"
       v-model="item.content"

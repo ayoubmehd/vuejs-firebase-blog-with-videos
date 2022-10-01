@@ -43,7 +43,11 @@ const routes: RouteRecordRaw[] = [
     component: () => import("./views/SingleBlog.vue"),
     name: "blog",
   },
-
+  {
+    path: "/:id/edit",
+    component: () => import("./views/EditBlog.vue"),
+    name: "blog-edit",
+  },
   {
     path: "/:any(.*)*",
     name: "not-found",
@@ -57,15 +61,11 @@ const router = createRouter({
 });
 
 router.beforeEach((to) => {
-  if (!!store.state.user) return true;
-
-  if (!!to.meta.public) return true;
-
-  if (!store.state.user) {
+  if (!store.state.user && !to.meta.public) {
     return "/login";
   }
 
-  return false;
+  return true;
 });
 
 export default router;

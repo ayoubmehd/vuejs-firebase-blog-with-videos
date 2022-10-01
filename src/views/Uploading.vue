@@ -28,10 +28,16 @@ function secondsToHms(d: number) {
 }
 
 async function publishPost() {
-  const post = await addDoc(collection(db, "posts"), {
-    isPublished: true,
-    title: store.state.post.title,
-  });
+  const post = await (async () => {
+    if (!!store.state.postId) {
+      return doc(db, "posts", store.state.postId);
+    }
+
+    return addDoc(collection(db, "posts"), {
+      isPublished: true,
+      title: store.state.post.title,
+    });
+  })();
 
   Promise.all(
     postContent.map((item: any) =>
@@ -41,6 +47,7 @@ async function publishPost() {
     router.push({
       path: "/",
     });
+    store.commit("clear");
   });
 }
 

@@ -82,19 +82,20 @@ function getVideoDuration(file: File) {
     v-if="type === 'text'"
     v-model="content"
     type="textarea"
-    label="Your Essay"
-    placeholder="Remember to write in complete sentences."
-    help="I'll know if you didn't read the book!"
+    label="Text content"
   />
   <FormKit v-else type="group">
     <FormKit
       type="file"
       @change="getFile"
-      label="Your Essay"
+      label="Video"
       accept="video/*"
       prefix-icon="fileVideo"
-      placeholder="Remember to write in complete sentences."
-      help="I'll know if you didn't read the book!"
+      :help="
+        store.state.postId
+          ? 'This video will be added to your existing post'
+          : ''
+      "
     />
   </FormKit>
 </template>
