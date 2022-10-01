@@ -1,14 +1,16 @@
 import { createStore } from "vuex";
 
 export default createStore<{
-  post: any;
+  post: { title: string };
   postContent: any[];
   files: File[];
   user: any;
 }>({
   state() {
     return {
-      post: null,
+      post: {
+        title: "",
+      },
       postContent: [],
       files: [],
       user: null,

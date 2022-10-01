@@ -1,14 +1,24 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
 import BlogInput from "./BlogInput.vue";
 
-const emit = defineEmits(["submit"]);
-
 const store = useStore();
+const { post } = store.state;
 
 const router = useRouter();
+
+const postTitle = computed({
+  get() {
+    return post.title;
+  },
+  set(val) {
+    store.commit("updatePost", {
+      title: val,
+    });
+  },
+});
 
 const content = store.state.postContent;
 
@@ -34,6 +44,13 @@ function newText() {
     submit-label="Save"
     :actions="false"
   >
+    <FormKit
+      label="Post tile"
+      placeholder="Put your post title"
+      type="text"
+      v-model="postTitle"
+    />
+
     <BlogInput
       v-for="item in content"
       :type="item.type"

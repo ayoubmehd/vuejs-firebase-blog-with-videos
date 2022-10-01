@@ -30,6 +30,7 @@ function secondsToHms(d: number) {
 async function publishPost() {
   const post = await addDoc(collection(db, "posts"), {
     isPublished: true,
+    title: store.state.post.title,
   });
 
   Promise.all(

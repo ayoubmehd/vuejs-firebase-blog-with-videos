@@ -32,16 +32,15 @@ onMounted(() => {
 <template>
   <div class="bg-white py-6 sm:py-8 lg:py-12">
     <template v-if="post">
+      <h1
+        class="text-gray-800 text-2xl sm:text-3xl font-bold text-center mb-4 md:mb-6"
+      >
+        {{ post.title }}
+      </h1>
       <div
         v-for="item in post.content"
         class="max-w-screen-md px-4 md:px-8 mx-auto"
       >
-        <h1
-          class="text-gray-800 text-2xl sm:text-3xl font-bold text-center mb-4 md:mb-6"
-        >
-          {{ post.title }}
-        </h1>
-
         <p
           v-if="item.type == 'text'"
           class="text-gray-500 sm:text-lg mb-6 md:mb-8"
