@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
+import store from "./store";
 
 const routes: RouteRecordRaw[] = [
   {
@@ -14,6 +15,24 @@ const routes: RouteRecordRaw[] = [
     path: "/new/upload",
     component: () => import("./views/Uploading.vue"),
   },
+
+  {
+    path: "/register",
+    component: () => import("./views/Register.vue"),
+    name: "register",
+    meta: {
+      public: true,
+    },
+  },
+  {
+    path: "/login",
+    component: () => import("./views/Login.vue"),
+    name: "login",
+    meta: {
+      public: true,
+    },
+  },
+
   {
     path: "/:id",
     component: () => import("./views/SingleBlog.vue"),
@@ -27,7 +46,21 @@ const routes: RouteRecordRaw[] = [
   },
 ];
 
-export default createRouter({
+const router = createRouter({
   history: createWebHistory(),
   routes,
 });
+
+router.beforeEach((to) => {
+  if (!!store.state.user) return true;
+
+  if (!!to.meta.public) return true;
+
+  if (!store.state.user) {
+    return "/login";
+  }
+
+  return false;
+});
+
+export default router;

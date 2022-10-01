@@ -1,11 +1,17 @@
 import { createStore } from "vuex";
 
-export default createStore<{ post: any; postContent: any[]; files: File[] }>({
+export default createStore<{
+  post: any;
+  postContent: any[];
+  files: File[];
+  user: any;
+}>({
   state() {
     return {
       post: null,
       postContent: [],
       files: [],
+      user: null,
     };
   },
   mutations: {
@@ -17,6 +23,9 @@ export default createStore<{ post: any; postContent: any[]; files: File[] }>({
     },
     newFile(state, data) {
       state.files.push(data);
+    },
+    setUser(state, { user }) {
+      state.user = user;
     },
   },
 
