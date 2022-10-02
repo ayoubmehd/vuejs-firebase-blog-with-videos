@@ -1,12 +1,9 @@
 <script setup lang="ts">
-import {
-  browserSessionPersistence,
-  createUserWithEmailAndPassword,
-  setPersistence,
-  signInWithEmailAndPassword,
-} from "firebase/auth";
-import { useStore } from "vuex";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { useRouter } from "vue-router";
 import { auth } from "../firebase";
+
+const router = useRouter();
 
 function handleSubmit({
   email,
@@ -15,7 +12,11 @@ function handleSubmit({
   email: string;
   password: string;
 }) {
-  signInWithEmailAndPassword(auth, email, password);
+  signInWithEmailAndPassword(auth, email, password).then(() => {
+    router.push({
+      path: "/",
+    });
+  });
 }
 </script>
 

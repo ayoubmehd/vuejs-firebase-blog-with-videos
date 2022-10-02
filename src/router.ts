@@ -1,22 +1,32 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
+import { getUserInfo } from "./firebase";
 import store from "./store";
 
 const routes: RouteRecordRaw[] = [
   {
     path: "/",
-    component: () => import("./views/Home.vue"),
+    components: {
+      MainNavbar: () => import("./Layout/MainNavbar.vue"),
+      default: () => import("./views/Home.vue"),
+    },
     meta: {
       title: "Home",
     },
   },
   {
     path: "/new",
-    component: () => import("./views/NewBlog.vue"),
+    components: {
+      MainNavbar: () => import("./Layout/MainNavbar.vue"),
+      default: () => import("./views/NewBlog.vue"),
+    },
   },
 
   {
     path: "/new/upload",
-    component: () => import("./views/Uploading.vue"),
+    components: {
+      MainNavbar: () => import("./Layout/MainNavbar.vue"),
+      default: () => import("./views/Uploading.vue"),
+    },
   },
 
   {
@@ -40,18 +50,27 @@ const routes: RouteRecordRaw[] = [
 
   {
     path: "/:id",
-    component: () => import("./views/SingleBlog.vue"),
+    components: {
+      MainNavbar: () => import("./Layout/MainNavbar.vue"),
+      default: () => import("./views/SingleBlog.vue"),
+    },
     name: "blog",
   },
   {
     path: "/:id/edit",
-    component: () => import("./views/EditBlog.vue"),
+    components: {
+      MainNavbar: () => import("./Layout/MainNavbar.vue"),
+      default: () => import("./views/EditBlog.vue"),
+    },
     name: "blog-edit",
   },
   {
     path: "/:any(.*)*",
     name: "not-found",
-    component: () => import("./views/404.vue"),
+    components: {
+      MainNavbar: () => import("./Layout/MainNavbar.vue"),
+      default: () => import("./views/404.vue"),
+    },
   },
 ];
 
@@ -60,8 +79,15 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach((to) => {
-  if (!store.state.user && !to.meta.public) {
+router.beforeEach(async (to) => {
+  if (to.meta.public) {
+    return true;
+  }
+
+  const user = await getUserInfo();
+
+  if (!user) {
+    store.commit("setUser", { user });
     return "/login";
   }
 

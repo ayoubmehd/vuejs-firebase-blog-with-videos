@@ -36,7 +36,4 @@ const route = useRoute();
       </h1>
     </div>
   </header>
-  <div class="mb-6">
-    <slot></slot>
-  </div>
 </template>
