@@ -65,6 +65,14 @@ const routes: RouteRecordRaw[] = [
     name: "blog-edit",
   },
   {
+    path: "/verfiy-email",
+    components: {
+      // MainNavbar: () => import("./Layout/MainNavbar.vue"),
+      default: () => import("./views/VerfiyEmail.vue"),
+    },
+    name: "verfiy-email",
+  },
+  {
     path: "/:any(.*)*",
     name: "not-found",
     components: {
@@ -80,15 +88,25 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to) => {
+  const user = await getUserInfo();
+
+  store.commit("setUser", { user });
+  if (to.name === "verfiy-email") {
+    return true;
+  }
+
   if (to.meta.public) {
     return true;
   }
 
-  const user = await getUserInfo();
-
   if (!user) {
-    store.commit("setUser", { user });
     return "/login";
+  }
+
+  if (!user.emailVerified) {
+    console.log(user.emailVerified);
+
+    return "/verfiy-email";
   }
 
   return true;

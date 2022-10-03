@@ -1,7 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
-import { getAuth } from "firebase/auth";
+import { getAuth, User } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_APP_KEY,
@@ -17,10 +17,14 @@ const db = getFirestore(app);
 const storage = getStorage(app);
 const auth = getAuth(app);
 
-function getUserInfo() {
+function getUserInfo(): Promise<User> {
   return new Promise((resolve, reject) => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       unsubscribe();
+      if (!user) {
+        return reject(user);
+      }
+
       resolve(user);
     }, reject);
   });

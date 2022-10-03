@@ -1,7 +1,19 @@
 <script setup lang="ts">
-import { useRoute } from "vue-router";
+import { signOut } from "firebase/auth";
+import { useRoute, useRouter } from "vue-router";
+import { auth } from "../firebase";
 
 const route = useRoute();
+
+const router = useRouter();
+
+async function logout() {
+  await signOut(auth);
+
+  router.push({
+    path: "/login",
+  });
+}
 </script>
 
 <template>
@@ -9,18 +21,9 @@ const route = useRoute();
     <div
       class="container mx-auto flex flex-wrap justify-center p-5 flex-col md:flex-row items-center"
     >
-      <nav class="flex flex-wrap items-center text-base">
-        <router-link to="" class="mr-5 hover:text-gray-900">
-          First Link
-        </router-link>
-        <router-link to="" class="mr-5 hover:text-gray-900">
-          Second Link
-        </router-link>
-        <router-link to="" class="mr-5 hover:text-gray-900">
-          Third Link
-        </router-link>
-        <router-link to="" class="mr-5 hover:text-gray-900">
-          Fourth Link
+      <nav class="flex mx-auto flex-wrap items-center text-base">
+        <router-link to="/" class="mr-5 hover:text-gray-900">
+          Home
         </router-link>
         <router-link
           :to="{ path: '/new' }"
@@ -29,6 +32,10 @@ const route = useRoute();
           New Post
         </router-link>
       </nav>
+
+      <div>
+        <button @click="logout" class="mr-5 hover:text-gray-900">Logout</button>
+      </div>
     </div>
     <div class="flex justify-center">
       <h1 class="text-4xl mt-6 mb-8">
