@@ -2,8 +2,7 @@ import { createStore } from "vuex";
 
 export default createStore<{
   postId: string | null;
-  post: { title: string };
-  postContent: any[];
+  post: { title: string; content: any[] };
   files: File[];
   user: any;
 }>({
@@ -12,8 +11,8 @@ export default createStore<{
       postId: null, // if id is null then add a new post otherwise edit
       post: {
         title: "",
+        content: [],
       },
-      postContent: [],
       files: [],
       user: null,
     };
@@ -22,14 +21,11 @@ export default createStore<{
     updatePost(state, data) {
       state.post = data;
     },
-    setPostContent(state, data) {
-      state.postContent = data;
-    },
     setPostId(state, { id }) {
       state.postId = id;
     },
     newPostContent(state, data) {
-      state.postContent.push(data);
+      state.post.content.push(data);
     },
     newFile(state, data) {
       state.files.push(data);
@@ -39,15 +35,14 @@ export default createStore<{
     },
     clear(state) {
       state.files = [];
-      state.postContent = [];
-      state.post = { title: "" };
+      state.post = { title: "", content: [] };
       state.postId = null;
     },
   },
 
   getters: {
     videos(state) {
-      return state.postContent
+      return state.post.content
         .filter((item) => item.type === "video")
         .map((item) => item.content);
     },

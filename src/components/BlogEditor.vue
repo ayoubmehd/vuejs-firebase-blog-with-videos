@@ -1,40 +1,52 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { onMounted, onUnmounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
 import BlogInput from "./BlogInput.vue";
 
 const store = useStore();
-const { post } = store.state;
 
 const router = useRouter();
 
-const postTitle = computed({
-  get() {
-    return post.title;
-  },
-  set(val) {
-    store.commit("updatePost", {
-      title: val,
-    });
-  },
+const post = ref<{ title: string; content: any[] }>({
+  title: "",
+  content: [],
 });
 
-const content = store.state.postContent;
+function next() {
+  store.commit("updatePost", post.value);
+
+  router.push("/new/upload");
+}
 
 function newFile() {
-  store.commit("newPostContent", {
+  post.value.content.push({
     type: "video",
     content: null,
   });
 }
 
 function newText() {
-  store.commit("newPostContent", {
+  post.value.content.push({
     type: "text",
     content: null,
   });
 }
+
+onMounted(() => {
+  store.watch(
+    () => store.state.post,
+    (value) => {
+      post.value = value;
+    }
+  );
+});
+onUnmounted(() => {
+  post.value = {
+    title: "",
+    content: [],
+  };
+});
 </script>
 <template>
   <FormKit
@@ -52,7 +64,7 @@ function newText() {
       label="Post title"
       placeholder="Put your post title"
       type="text"
-      v-model="postTitle"
+      v-model="post.title"
     />
 
     <BlogInput
@@ -60,7 +72,7 @@ function newText() {
       wrapper-class="max-w-full"
       inner-class="w-full"
       input-class="w-full h-48"
-      v-for="item in content"
+      v-for="item in post.content"
       :type="item.type"
       v-model="item.content"
     />
@@ -98,7 +110,7 @@ function newText() {
         </div>
       </template>
     </VDropdown>
-    <FormKit @click="router.push('/new/upload')" type="button" label="Next" />
+    <FormKit @click="next" type="button" label="Next" />
   </FormKit>
 </template>
 

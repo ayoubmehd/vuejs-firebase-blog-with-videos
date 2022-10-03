@@ -6,6 +6,8 @@ import { uploadBytesResumable } from "firebase/storage";
 import { useRouter } from "vue-router";
 import { addDoc, collection, doc, setDoc } from "firebase/firestore";
 import { db } from "../firebase";
+import { onUnmounted } from "vue";
+import { title } from "process";
 
 const router = useRouter();
 
@@ -16,7 +18,7 @@ const ffmpeg = createFFmpeg({
 
 const store = useStore();
 
-const { files, postContent } = store.state;
+const { files, post } = store.state;
 
 function secondsToHms(d: number) {
   d = Number(d);
@@ -27,10 +29,41 @@ function secondsToHms(d: number) {
   return `${h}:${m}:${s}`;
 }
 
-async function publishPost() {
-  const post = await (async () => {
+async function savePost() {
+  const newOrUpdateing = await (async () => {
     if (!!store.state.postId) {
       return doc(db, "posts", store.state.postId);
+    }
+
+    return addDoc(collection(db, "posts"), {
+      isPublished: false,
+      title: store.state.post.title,
+    });
+  })();
+
+  Promise.all(
+    post.content.map((item: any) =>
+      addDoc(collection(db, "posts", newOrUpdateing.id, "content"), item)
+    )
+  ).then(() => {
+    router.push({
+      path: "/",
+    });
+    store.commit("clear");
+  });
+}
+
+async function publishPost() {
+  const newOrUpdateing = await (async () => {
+    if (!!store.state.postId) {
+      const editing = doc(db, "posts", store.state.postId);
+
+      await setDoc(editing, {
+        ...store.state.post,
+        title: store.state.post.title,
+      });
+
+      return editing;
     }
 
     return addDoc(collection(db, "posts"), {
@@ -40,9 +73,17 @@ async function publishPost() {
   })();
 
   Promise.all(
-    postContent.map((item: any) =>
-      addDoc(collection(db, "posts", post.id, "content"), item)
-    )
+    post.content.map((item: any) => {
+      if (item.id) {
+        const exists = doc(db, "posts", newOrUpdateing.id, "content", item.id);
+
+        if (exists) {
+          return setDoc(exists, item);
+        }
+      }
+
+      addDoc(collection(db, "posts", newOrUpdateing.id, "content"), item);
+    })
   ).then(() => {
     router.push({
       path: "/",
@@ -50,6 +91,10 @@ async function publishPost() {
     store.commit("clear");
   });
 }
+
+onUnmounted(() => {
+  store.commit("clear");
+});
 
 async function startUploading(file: any) {
   await ffmpeg.load();
@@ -113,7 +158,29 @@ async function startUploading(file: any) {
       </div>
     </template>
     <div class="w-full text-center mb-3" v-else>No files to upload</div>
-    <FormKit @click="publishPost" type="button" label="Publish" />
+
+    <div class="flex justify-center my-4 w-full">
+      <div class="w-1/3 flex">
+        <FormKit
+          @click="savePost"
+          wrapper-class="h-full mr-1"
+          input-class="inline-block h-full px-6 py-2 border-2 border-purple-600 text-purple-600 font-medium text-xs leading-tight uppercase rounded hover:bg-black hover:bg-opacity-5 focus:outline-none focus:ring-0 transition duration-150 ease-in-out"
+          :classes="{
+            input: {
+              $reset: true,
+            },
+          }"
+          type="button"
+          label="Save"
+        />
+        <FormKit
+          wrapper-class="ml-1"
+          @click="publishPost"
+          type="button"
+          label="Publish"
+        />
+      </div>
+    </div>
   </div>
 </template>
 
