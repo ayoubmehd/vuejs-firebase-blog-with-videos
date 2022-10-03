@@ -26,7 +26,7 @@ onMounted(() => {
     const content = (await getDocs(contentQuery)).docs.map((item) => ({
       ...item.data(),
       id: item.id,
-    }));
+    })) as any[];
 
     const post = {
       ...data,

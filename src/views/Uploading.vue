@@ -2,12 +2,17 @@
 import { useStore } from "vuex";
 import { createFFmpeg, fetchFile } from "@ffmpeg/ffmpeg";
 import Progress from "../components/Progress.vue";
-import { uploadBytesResumable } from "firebase/storage";
+import {
+  uploadBytesResumable,
+  ref as storageRef,
+  getBytes,
+} from "firebase/storage";
 import { useRouter } from "vue-router";
 import { addDoc, collection, doc, setDoc } from "firebase/firestore";
-import { db } from "../firebase";
-import { onUnmounted } from "vue";
+import { db, storage } from "../firebase";
+import { onMounted, onUnmounted, ref } from "vue";
 import { title } from "process";
+import { getVideoDuration } from "../files/getVideoDuration";
 
 const router = useRouter();
 
@@ -15,6 +20,9 @@ const ffmpeg = createFFmpeg({
   log: true,
   corePath: "/node_modules/@ffmpeg/core/dist/ffmpeg-core.js",
 });
+
+const isDonwlodingFiles = ref(false);
+const ffmpegLoaded = ref(false);
 
 const store = useStore();
 
@@ -92,23 +100,60 @@ async function publishPost() {
   });
 }
 
+onMounted(() => {
+  (async () => {
+    isDonwlodingFiles.value = true;
+
+    const filesToDownload = store.state.post.content
+      .filter((item: any) => item.type === "video")
+      .map((item: any) => item.content);
+
+    Promise.all(
+      filesToDownload.map(async (file: any) => {
+        const fileRef = storageRef(storage, file);
+
+        const fileBytes = await getBytes(fileRef);
+
+        const duration = await getVideoDuration(fileBytes);
+
+        store.commit("newFile", {
+          file: fileBytes,
+          duration,
+          progress: 0,
+          from: 0,
+          to: duration,
+          videoRef: fileRef,
+          name: file.split("/").pop(),
+        });
+        return fileBytes;
+      })
+    ).then(() => {
+      isDonwlodingFiles.value = false;
+    });
+  })();
+});
+
 onUnmounted(() => {
   store.commit("clear");
 });
 
 async function startUploading(file: any) {
-  await ffmpeg.load();
+  if (!ffmpegLoaded.value) {
+    await ffmpeg.load();
+    ffmpegLoaded.value = true;
+  }
 
-  ffmpeg.FS("writeFile", file.file.name, await fetchFile(file.file));
+  ffmpeg.FS("writeFile", file.name, await fetchFile(file.file));
 
   const start = secondsToHms(file.from);
   const end = secondsToHms(file.to);
 
-  const outputFile = file.file.name.split(".").slice(0, -1) + "-cuted.mp4";
+  const outputFile =
+    file.name.split(".").slice(0, -1) + "-cuted." + file.name.split(".").pop();
 
   await ffmpeg.run(
     "-i",
-    file.file.name,
+    file.name,
     "-ss",
     start,
     "-to",

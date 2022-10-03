@@ -10,6 +10,7 @@ import { ref as storageRef } from "firebase/storage";
 import { v4 as uuid } from "uuid";
 import { computed, onMounted, ref, unref } from "vue";
 import { useStore } from "vuex";
+import { getVideoDuration } from "../files/getVideoDuration";
 import { db, storage } from "../firebase";
 
 const store = useStore();
@@ -56,24 +57,7 @@ async function getFile($event: any) {
     from: 0,
     to: duration,
     videoRef,
-  });
-}
-
-function getVideoDuration(file: File) {
-  const video = document.createElement("video");
-  video.preload = "metadata";
-
-  video.src = URL.createObjectURL(file);
-  return new Promise((resolve, reject) => {
-    video.onloadedmetadata = () => {
-      URL.revokeObjectURL(video.src);
-
-      resolve(video.duration);
-    };
-
-    video.onerror = (err) => {
-      reject("Video format is not suported");
-    };
+    name: file.name,
   });
 }
 </script>
