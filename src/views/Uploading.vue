@@ -198,7 +198,7 @@ async function startUploading(file: any) {
           label="To"
           type="number"
         />
-        <pre wrap>{{ file.progress + "%" }}</pre>
+        <pre wrap>{{ file.progress.toFixed(0) + "%" }}</pre>
         <FormKit type="button" label="Upload" @click="startUploading(file)" />
       </div>
     </template>
